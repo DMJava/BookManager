@@ -1,35 +1,49 @@
 package net.project.bookmanager.controller;
 
-import net.project.bookmanager.model.Book;
-import net.project.bookmanager.service.BookService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+//import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import net.project.bookmanager.model.Book;
+import net.project.bookmanager.service.BookService;
 
 @Controller
+@RequestMapping(value = "/books")
 public class BookController {
+	
+	@Autowired
     private BookService bookService;
 
-    @Autowired(required = true)
-    @Qualifier(value = "bookService")
-    public void setBookService(BookService bookService) {
-        this.bookService = bookService;
+//    @Autowired(required = true)
+//    @Qualifier(value = "bookService")
+//    public void setBookService(BookService bookService) {
+//        this.bookService = bookService;
+//    }
+
+    @RequestMapping(value = "/list-book", method = RequestMethod.GET)
+//    public String listBooks(Model model){
+    public ResponseEntity<List<Book>> listBooks(){
+    	List<Book> listBook = bookService.listBooks();
+//    	
+//        model.addAttribute("book", new Book());
+//        model.addAttribute("listBooks", this.bookService.listBooks());
+
+    	ResponseEntity<List<Book>> entity = new ResponseEntity(listBook, HttpStatus.OK);
+        return entity;
     }
 
-    @RequestMapping(value = "books", method = RequestMethod.GET)
-    public String listBooks(Model model){
-        model.addAttribute("book", new Book());
-        model.addAttribute("listBooks", this.bookService.listBooks());
-
-        return "books";
-    }
-
-    @RequestMapping(value = "/books/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
     public String addBook(@ModelAttribute("book") Book book){
         if(book.getId() == 0){
             this.bookService.addBook(book);
